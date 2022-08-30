@@ -468,7 +468,12 @@ set(CONFIG_BUILD_DIR ${PROJECT_BINARY_DIR}/${CONFIG_INSTALL_DIR})
 set(EXTENSION_BUILD_DIR ${PROJECT_BINARY_DIR}/${PYTHONHOME}/lib-dynload)
 set(INCLUDE_BUILD_DIR ${SRC_DIR}/Include)
 
-set(ARCHIVEDIR "libs")      # Contains the static (*.a) and import libraries (*.lib)
+# Contains the static (*.a) and import libraries (*.lib)
+if(MINGW)
+    set(ARCHIVEDIR "lib")
+else()
+    set(ARCHIVEDIR "libs")
+endif()
 
 # Directories specific to 'libpython'
 set(LIBPYTHON_LIBDIR ${LIBDIR})
