@@ -436,7 +436,7 @@ if(USE_LIB64)
     set(LIBDIR "lib64")
 endif()
 set(PYTHONHOME "${LIBDIR}")
-if(UNIX)
+if(UNIX OR MINGW)
     set(PYTHONHOME "${PYTHONHOME}/${LIBPYTHON}")
 endif()
 
