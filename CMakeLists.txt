@@ -806,7 +806,7 @@ set(INCLUDE_DIR_CONFIG ${INCLUDE_BUILD_DIR})
 set(PYTHON_CONFIG_CODE "####### Expanded from \@PYTHON_CONFIG_CODE\@ #######\n")
 set(PYTHON_CONFIG_CODE "${PYTHON_CONFIG_CODE}list(APPEND PYTHON_INCLUDE_DIR \"${PYCONFIG_BUILD_DIR}\")\n")
 set(PYTHON_CONFIG_CODE "${PYTHON_CONFIG_CODE}##################################################")
-set(python_config ${CONFIG_BUILD_DIR}/PythonConfig.cmake)
+set(python_config ${CONFIG_BUILD_DIR}/Python${PY_VERSION_MAJOR}Config.cmake)
 configure_package_config_file(
     cmake/PythonConfig.cmake.in
     ${python_config}
@@ -819,7 +819,7 @@ configure_package_config_file(
 set(CONFIG_DIR_CONFIG ${CONFIG_INSTALL_DIR})
 set(INCLUDE_DIR_CONFIG ${INCLUDE_INSTALL_DIR})
 set(PYTHON_CONFIG_CODE "")
-set(python_install_config ${PROJECT_BINARY_DIR}/CMakeFiles/PythonConfig.cmake)
+set(python_install_config ${PROJECT_BINARY_DIR}/CMakeFiles/Python${PY_VERSION_MAJOR}Config.cmake)
 configure_package_config_file(
     cmake/PythonConfig.cmake.in
     ${python_install_config}
@@ -830,9 +830,9 @@ configure_package_config_file(
 
 # Configure 'PythonTargets.cmake' and 'PythonConfigVersion.cmake
 get_property(PYTHON_TARGETS GLOBAL PROPERTY PYTHON_TARGETS)
-export(TARGETS ${PYTHON_TARGETS} APPEND FILE ${CONFIG_BUILD_DIR}/PythonTargets.cmake)
+export(TARGETS ${PYTHON_TARGETS} APPEND FILE ${CONFIG_BUILD_DIR}/Python${PY_VERSION_MAJOR}Targets.cmake)
 
-set(python_config_version ${CONFIG_BUILD_DIR}/PythonConfigVersion.cmake)
+set(python_config_version ${CONFIG_BUILD_DIR}/Python${PY_VERSION_MAJOR}ConfigVersion.cmake)
 write_basic_package_version_file(
     ${python_config_version}
     VERSION ${PY_VERSION}
@@ -842,7 +842,7 @@ write_basic_package_version_file(
 if(INSTALL_DEVELOPMENT)
     # Install 'PythonTargets.cmake', 'PythonConfig.cmake' and 'PythonConfigVersion.cmake
     install(EXPORT PythonTargets
-        FILE PythonTargets.cmake
+        FILE Python${PY_VERSION_MAJOR}Targets.cmake
         DESTINATION ${CONFIG_INSTALL_DIR} COMPONENT Development)
 
     install(
