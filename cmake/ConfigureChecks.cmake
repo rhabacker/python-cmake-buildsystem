@@ -155,7 +155,7 @@ find_library(TIRPC_LIBRARY tirpc)
 
 find_library(UUID_LIBRARY uuid)
 
-if(WIN32)
+if(WIN32 AND NOT MINGW)
   set(M_LIBRARIES )
   set(HAVE_LIBM 1)
   # From PC/pyconfig.h: 
@@ -204,12 +204,19 @@ if(WITH_PYMALLOC AND PY_VERSION VERSION_LESS "3.8")
 endif()
 message(STATUS "${_msg} - ${ABIFLAGS}")
 
-set(_msg "Checking SOABI")
-try_run(PLATFORM_RUN PLATFORM_COMPILE
-        ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/platform.c
-        RUN_OUTPUT_VARIABLE PLATFORM_TRIPLET)
-if(NOT PLATFORM_COMPILE)
-  message(FATAL_ERROR "We could not determine the platform. Please clean the ${CMAKE_PROJECT_NAME} environment and try again...")
+if(MINGW)
+    execute_process(
+        COMMAND ${CMAKE_C_COMPILER} -dumpmachine
+        OUTPUT_VARIABLE PLATFORM_TRIPLET
+    )
+else()
+    set(_msg "Checking SOABI")
+    try_run(PLATFORM_RUN PLATFORM_COMPILE
+            ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/cmake/platform.c
+            RUN_OUTPUT_VARIABLE PLATFORM_TRIPLET)
+    if(NOT PLATFORM_COMPILE)
+      message(FATAL_ERROR "We could not determine the platform. Please clean the ${CMAKE_PROJECT_NAME} environment and try again...")
+    endif()
 endif()
 set(SOABI "cpython-${PY_VERSION_MAJOR}${PY_VERSION_MINOR}${ABIFLAGS}-${PLATFORM_TRIPLET}")
 
@@ -430,7 +437,9 @@ endif()
 find_library(HAVE_LIBTERMCAP termcap)
 
 set(LIBUTIL_LIBRARIES )
-set(LIBUTIL_EXPECTED 1)
+if(NOT MINGW)
+    set(LIBUTIL_EXPECTED 1)
+endif()
 
 if(CMAKE_SYSTEM MATCHES "VxWorks\\-7$")
   set(LIBUTIL_EXPECTED 0)

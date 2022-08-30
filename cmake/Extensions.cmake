@@ -178,7 +178,7 @@ function(add_python_extension name)
             if(require_limited_api STREQUAL "")
               list(APPEND ADD_PYTHON_EXTENSION_LIBRARIES libpython-shared)
             else()
-              list(APPEND ADD_PYTHON_EXTENSION_LIBRARIES libpython3-shared)
+              list(APPEND ADD_PYTHON_EXTENSION_LIBRARIES libpython-shared)
             endif()
         endif()
 

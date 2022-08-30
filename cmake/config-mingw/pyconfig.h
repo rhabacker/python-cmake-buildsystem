@@ -86,16 +86,12 @@ WIN32 is still required for the locale module.
 /* set the version macros for the windows headers */
 #ifdef MS_WINX64
 /* 64 bit only runs on XP or greater */
-#  define Py_WINVER _WIN32_WINNT_WINXP
-#  define Py_NTDDI NTDDI_WINXP
+#  define Py_WINVER _WIN32_WINNT_WIN7
+#  define Py_NTDDI NTDDI_WIN7
 #else
 /* Python 2.6+ requires Windows 2000 or greater */
-#  ifdef _WIN32_WINNT_WIN2K
-#    define Py_WINVER _WIN32_WINNT_WIN2K
-#  else
-#    define Py_WINVER 0x0500
-#  endif
-#  define Py_NTDDI NTDDI_WIN2KSP4
+#  define Py_WINVER _WIN32_WINNT_WIN7
+#  define Py_NTDDI NTDDI_WIN7
 #endif
 
 /* We only set these values when building Python - we don't want to force
@@ -382,7 +378,7 @@ Py_NO_ENABLE_SHARED to find out.  Also support MS_NO_COREDLL for b/w compat */
 
 /* Define as the size of the unicode type. */
 /* This is enough for unicodeobject.h to do the "right thing" on Windows. */
-#define Py_UNICODE_SIZE 2
+/* #undef Py_UNICODE_SIZE */
 
 /* Use Python's own small-block memory-allocator. */
 #define WITH_PYMALLOC 1
@@ -562,5 +558,14 @@ Py_NO_ENABLE_SHARED to find out.  Also support MS_NO_COREDLL for b/w compat */
 /* Define if C doubles are 64-bit IEEE 754 binary format, stored with the
    least significant byte first */
 #define DOUBLE_IS_LITTLE_ENDIAN_IEEE754 1
+
+/* The size of `wchar_t', as computed by sizeof. */
+#cmakedefine SIZEOF_WCHAR_T @SIZEOF_WCHAR_T@
+
+#define PLATLIBDIR "lib"
+/* framework name [Python 3.7] */
+#define _PYTHONFRAMEWORK "@PYTHONFRAMEWORK@"
+
+#cmakedefine SIZEOF__BOOL @SIZEOF__BOOL@
 
 #endif /* !Py_CONFIG_H */

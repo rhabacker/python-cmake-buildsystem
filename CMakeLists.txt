@@ -428,7 +428,7 @@ include(cmake/ConfigureChecks.cmake)
 
 # Set PYTHONHOME
 set(LIBDIR "Lib") # See Lib/distutils/sysconfig.py - function 'get_python_lib'
-if(UNIX)
+if(UNIX OR MINGW)
     set(LIBDIR "lib")
 endif()
 if(USE_LIB64)
@@ -488,14 +488,17 @@ if(UNIX)
     set(PYCONFIG_BUILD_DIR ${BIN_BUILD_DIR})
     configure_file(cmake/config-unix/pyconfig.h.in
                    ${PYCONFIG_BUILD_DIR}/pyconfig.h)
-elseif(WIN32)
+elseif(MINGW)
+    set(PYCONFIG_BUILD_DIR ${BIN_BUILD_DIR})
+    configure_file(cmake/config-mingw/pyconfig.h
+        ${PYCONFIG_BUILD_DIR}/pyconfig.h @ONLY)
+    configure_file(${SRC_DIR}/PC/errmap.h
+        ${PYCONFIG_BUILD_DIR}/errmap.h COPYONLY)
+else()
     set(PYCONFIG_BUILD_DIR ${SRC_DIR}/PC) # In a windows build tree, 'pyconfig.h' is NOT required to
                                           # live along side the python executable.
                                           # See function '_init_posix()' and '_init_non_posix()'
                                           # in 'Lib/sysconfig.py'
-    if(MINGW)
-      set(PYCONFIG_BUILD_DIR cmake/config-mingw)
-    endif()
 endif()
 
 # Install 'pyconfig.h'
