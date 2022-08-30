@@ -446,7 +446,11 @@ if(INSTALL_WINDOWS_TRADITIONAL)
     set(BIN_INSTALL_DIR .)                       # Contains the python executable
 endif()
 set(LD_VERSION ${LIBPYTHON_VERSION}${ABIFLAGS})
-set(CONFIG_INSTALL_DIR share/${LIBPYTHON})
+if(MINGW)
+    set(CONFIG_INSTALL_DIR lib/cmake/${LIBPYTHON})
+else()
+    set(CONFIG_INSTALL_DIR share/${LIBPYTHON})
+endif()
 set(EXTENSION_INSTALL_DIR ${PYTHONHOME}/lib-dynload)
 
 if (${LIBPYTHON_VERSION} GREATER 3.1)
