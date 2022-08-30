@@ -679,11 +679,13 @@ add_python_extension(_curses_panel
     REQUIRES ${curses_common_REQUIRES} PANEL_LIBRARIES "HAVE_PANEL_H OR HAVE_NCURSES_PANEL_H"
     SOURCES _curses_panel.c
     LIBRARIES ${curses_common_LIBRARIES} ${PANEL_LIBRARIES}
+    INCLUDEDIRS ${CURSES_INCLUDE_DIR}
 )
 add_python_extension(_curses
     REQUIRES ${curses_common_REQUIRES}
     SOURCES _cursesmodule.c
     LIBRARIES ${curses_common_LIBRARIES}
+    INCLUDEDIRS ${CURSES_INCLUDE_DIR}
 )
 set(dbm2_SOURCES dbmmodule.c)
 set(dbm3_SOURCES _dbmmodule.c)
