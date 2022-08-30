@@ -1,0 +1,179 @@
+diff -ur Python-3.9.10.orig/Include/pyport.h Python-3.9.10/Include/pyport.h
+--- Python-3.9.10.orig/Include/pyport.h	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Include/pyport.h	2022-08-30 12:40:11.363822149 +0200
+@@ -70,12 +70,14 @@
+ #define PY_ULLONG_MAX ULLONG_MAX
+ #endif
+ 
++#ifndef PY_UINT32_T
+ #define PY_UINT32_T uint32_t
+ #define PY_UINT64_T uint64_t
+ 
+ /* Signed variants of the above */
+ #define PY_INT32_T int32_t
+ #define PY_INT64_T int64_t
++#endif
+ 
+ /* If PYLONG_BITS_IN_DIGIT is not defined then we'll use 30-bit digits if all
+    the necessary integer types are available, and we're on a 64-bit platform
+diff -ur Python-3.9.10.orig/Modules/_curses_panel.c Python-3.9.10/Modules/_curses_panel.c
+--- Python-3.9.10.orig/Modules/_curses_panel.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Modules/_curses_panel.c	2022-08-31 16:40:27.611436683 +0200
+@@ -14,7 +14,11 @@
+ 
+ #include "py_curses.h"
+ 
+-#include <panel.h>
++#ifdef HAVE_NCURSESW
++#include <ncursesw/panel.h>
++#else
++#include <ncurses/panel.h>
++#endif
+ 
+ typedef struct {
+     PyObject *PyCursesError;
+diff -ur Python-3.9.10.orig/Modules/_localemodule.c Python-3.9.10/Modules/_localemodule.c
+--- Python-3.9.10.orig/Modules/_localemodule.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Modules/_localemodule.c	2022-08-30 12:40:11.363822149 +0200
+@@ -144,7 +144,7 @@
+ static int
+ locale_decode_monetary(PyObject *dict, struct lconv *lc)
+ {
+-#ifndef MS_WINDOWS
++#if !defined(MS_WINDOWS) || defined(__MINGW32__)
+     int change_locale;
+     change_locale = (!locale_is_ascii(lc->int_curr_symbol)
+                      || !locale_is_ascii(lc->currency_symbol)
+@@ -253,7 +253,7 @@
+         Py_DECREF(obj); \
+     } while (0)
+ 
+-#ifdef MS_WINDOWS
++#if defined(MS_WINDOWS) && !defined(__MINGW32__)
+ /* Use _W_* fields of Windows struct lconv */
+ #define GET_LOCALE_STRING(ATTR) PyUnicode_FromWideChar(lc->_W_ ## ATTR, -1)
+ #else
+diff -ur Python-3.9.10.orig/Modules/posixmodule.c Python-3.9.10/Modules/posixmodule.c
+--- Python-3.9.10.orig/Modules/posixmodule.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Modules/posixmodule.c	2022-08-30 12:40:11.363822149 +0200
+@@ -297,7 +297,7 @@
+ #  define HAVE_SYSTEM     1
+ #  include <process.h>
+ #else
+-#  ifdef _MSC_VER
++#  ifdef MS_WINDOWS
+      /* Microsoft compiler */
+ #    define HAVE_GETPPID    1
+ #    define HAVE_GETLOGIN   1
+@@ -330,7 +330,7 @@
+ #    define HAVE_SYSTEM     1
+ #    define HAVE_WAIT       1
+ #    define HAVE_TTYNAME    1
+-#  endif  /* _MSC_VER */
++#  endif  /* MS_WINDOWS */
+ #endif  /* ! __WATCOMC__ || __QNX__ */
+ 
+ _Py_IDENTIFIER(__fspath__);
+@@ -341,7 +341,7 @@
+ [clinic start generated code]*/
+ /*[clinic end generated code: output=da39a3ee5e6b4b0d input=94a0f0f978acae17]*/
+ 
+-#ifndef _MSC_VER
++#ifndef MS_WINDOWS
+ 
+ #if defined(__sgi)&&_COMPILER_VERSION>=700
+ /* declare ctermid_r if compiling with MIPSPro 7.x in ANSI C mode
+@@ -349,7 +349,7 @@
+ extern char        *ctermid_r(char *);
+ #endif
+ 
+-#endif /* !_MSC_VER */
++#endif /* !MS_WINDOWS */
+ 
+ #if defined(__VXWORKS__)
+ #  include <vxCpuLib.h>
+@@ -410,7 +410,7 @@
+ #  endif
+ #endif
+ 
+-#ifdef _MSC_VER
++#ifdef MS_WINDOWS
+ #  ifdef HAVE_DIRECT_H
+ #    include <direct.h>
+ #  endif
+@@ -432,7 +432,7 @@
+ #  include <shellapi.h>           // ShellExecute()
+ #  include <lmcons.h>             // UNLEN
+ #  define HAVE_SYMLINK
+-#endif /* _MSC_VER */
++#endif /* MS_WINDOWS */
+ 
+ #ifndef MAXPATHLEN
+ #  if defined(PATH_MAX) && PATH_MAX > 1024
+diff -ur Python-3.9.10.orig/Modules/socketmodule.c Python-3.9.10/Modules/socketmodule.c
+--- Python-3.9.10.orig/Modules/socketmodule.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Modules/socketmodule.c	2022-08-30 13:01:39.860510648 +0200
+@@ -302,7 +302,7 @@
+ # endif
+ 
+ /* Macros based on the IPPROTO enum, see: https://bugs.python.org/issue29515 */
+-#ifdef MS_WINDOWS
++#ifdef _MSC_VER
+ #define IPPROTO_ICMP IPPROTO_ICMP
+ #define IPPROTO_IGMP IPPROTO_IGMP
+ #define IPPROTO_GGP IPPROTO_GGP
+@@ -333,6 +333,8 @@
+ #define IPPROTO_PGM IPPROTO_PGM  // WinSock2 only
+ #define IPPROTO_L2TP IPPROTO_L2TP  // WinSock2 only
+ #define IPPROTO_SCTP IPPROTO_SCTP  // WinSock2 only
++#else
++#include <winsock2.h>
+ #endif /* MS_WINDOWS */
+ 
+ /* Provides the IsWindows7SP1OrGreater() function */
+Nur in Python-3.9.10: .patches.
+diff -ur Python-3.9.10.orig/PC/_testconsole.c Python-3.9.10/PC/_testconsole.c
+--- Python-3.9.10.orig/PC/_testconsole.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/PC/_testconsole.c	2022-08-30 12:40:11.363822149 +0200
+@@ -6,7 +6,7 @@
+ 
+ #ifdef MS_WINDOWS
+ 
+-#include "..\modules\_io\_iomodule.h"
++#include "../Modules/_io/_iomodule.h"
+ 
+ #define WIN32_LEAN_AND_MEAN
+ #include <windows.h>
+@@ -101,7 +101,7 @@
+     Py_RETURN_NONE;
+ }
+ 
+-#include "clinic\_testconsole.c.h"
++#include "clinic/_testconsole.c.h"
+ 
+ PyMethodDef testconsole_methods[] = {
+     _TESTCONSOLE_WRITE_INPUT_METHODDEF
+diff -ur Python-3.9.10.orig/Programs/python.c Python-3.9.10/Programs/python.c
+--- Python-3.9.10.orig/Programs/python.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Programs/python.c	2022-08-30 12:40:11.363822149 +0200
+@@ -2,7 +2,7 @@
+ 
+ #include "Python.h"
+ 
+-#ifdef MS_WINDOWS
++#if defined(MS_WINDOWS) && !defined(__MINGW32__)
+ int
+ wmain(int argc, wchar_t **argv)
+ {
+diff -ur Python-3.9.10.orig/Python/fileutils.c Python-3.9.10/Python/fileutils.c
+--- Python-3.9.10.orig/Python/fileutils.c	2022-01-13 22:21:23.000000000 +0100
++++ Python-3.9.10/Python/fileutils.c	2022-08-30 12:40:11.363822149 +0200
+@@ -2204,7 +2204,7 @@
+     assert(decimal_point != NULL);
+     assert(thousands_sep != NULL);
+ 
+-#ifndef MS_WINDOWS
++#if !defined(MS_WINDOWS) || defined(__MINGW32__)
+     int change_locale = 0;
+     if ((strlen(lc->decimal_point) > 1 || ((unsigned char)lc->decimal_point[0]) > 127)) {
+         change_locale = 1;
