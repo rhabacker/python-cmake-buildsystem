@@ -135,7 +135,9 @@ WIN32 is still required for the locale module.
 #define HAVE_CLOCK
 #define HAVE_STRERROR
 
+#ifndef __MINGW32__
 #include <io.h>
+#endif
 #include <stdio.h>
 
 /* 64 bit ints are usually spelt __int64 unless compiler has overridden */
