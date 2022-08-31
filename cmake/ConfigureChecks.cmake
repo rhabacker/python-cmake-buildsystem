@@ -2615,7 +2615,7 @@ python_platform_test_run(
 cmake_pop_check_state()
 
 # HAVE_IPA_PURE_CONST_BUG
-if(HAVE_GCC_ASM_FOR_X87 AND CMAKE_C_COMPILER_ID MATCHES "GNU")
+if(HAVE_GCC_ASM_FOR_X87 AND CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5.0)
   # Some versions of gcc miscompile inline asm:
   # http://gcc.gnu.org/bugzilla/show_bug.cgi?id=46491
   # http://gcc.gnu.org/ml/gcc/2010-11/msg00366.html
