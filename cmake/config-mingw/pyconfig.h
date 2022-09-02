@@ -570,4 +570,7 @@ Py_NO_ENABLE_SHARED to find out.  Also support MS_NO_COREDLL for b/w compat */
 
 #cmakedefine SIZEOF__BOOL @SIZEOF__BOOL@
 
+/* UINT */
+#include <minwindef.h>
+
 #endif /* !Py_CONFIG_H */
