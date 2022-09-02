@@ -418,7 +418,7 @@ endif()
 
 # This is the major version number of Python
 set(LIBPYTHON_VERSION ${PY_VERSION_MAJOR}.${PY_VERSION_MINOR})
-if(WIN32)
+if(WIN32 AND NOT MINGW)
     set(LIBPYTHON_VERSION ${PY_VERSION_MAJOR}${PY_VERSION_MINOR})
 endif()
 set(LIBPYTHON python${LIBPYTHON_VERSION})
